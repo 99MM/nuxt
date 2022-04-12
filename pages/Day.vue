@@ -62,100 +62,22 @@
             default: 12
           }
         },
-        items: [
-          {
-            id: 1,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 3,
-            price: 300,
-            owner_id: 1,
-            owner_name: '名稱名稱名稱名稱'
-          },
-          {
-            id: 2,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 1,
-            user_id: 4,
-            price: 300,
-            owner_id: 1,
-            owner_name: '名稱名稱名稱名稱'
-          },
-          {
-            id: 3,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 2,
-            user_id: 4,
-            price: 300,
-            owner_id: 2,
-            owner_name: '名稱名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 3,
-            user_id: 4,
-            price: 300,
-            owner_id: 3,
-            owner_name: '名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 1,
-            price: 300,
-            owner_id: 3,
-            owner_name: '名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 2,
-            price: 300,
-            owner_id: 3,
-            owner_name: '名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 5,
-            price: 300,
-            owner_id: 3,
-            owner_name: '名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 5,
-            price: 300,
-            owner_id: 4,
-            owner_name: '名稱名稱名稱'
-          },
-          {
-            id: 4,
-            title: '項目名稱',
-            date: '2021-11-25 05:59:37',
-            item_user_id: 4,
-            user_id: 7,
-            price: 300,
-            owner_id: 3,
-            owner_name: '名稱名稱'
-          }
-        ]
-
+        items: []
       };
+    },
+    created(){
+      for (var i = 0; i < 1000; i++) {
+        this.items.push({
+          id: i,
+          title: '項目名稱',
+          date: '2021-11-25 05:59:37',
+          item_user_id: Math.floor(Math.random()*(4-3+1))+3,
+          user_id: Math.floor(Math.random()*(4-3+1))+3,
+          price: Math.floor(Math.random() * 10000),
+          owner_id: 1,
+          owner_name: Math.floor(Math.random() * 100)
+        });
+      }
     },
     mounted() {
       let ary_re = [], ary_pay = [];

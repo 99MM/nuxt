@@ -28,12 +28,12 @@
           <div style="position:relative; margin-top: 30px;">
             <div style="position: absolute;">
 
-<!--              <span class="item" style="background-color: lightseagreen;">-->
-<!--                收款項目 3-->
-<!--              </span>-->
-<!--              <span class="item" style="background-color: darkseagreen;">-->
-<!--                付款項目 2-->
-<!--              </span>-->
+              <span class="item" style="background-color: lightseagreen;" v-if="calendarMonth[(i-1)*7+j-1].pay_item !== 0">
+                收款項目 {{ calendarMonth[(i - 1) * 7 + j - 1].pay_item }}
+              </span>
+              <span class="item" style="background-color: darkseagreen;" v-if="calendarMonth[(i-1)*7+j-1].receive_item !== 0">
+                付款項目 {{ calendarMonth[(i - 1) * 7 + j - 1].receive_item }}
+              </span>
 
             </div>
           </div>
@@ -47,6 +47,8 @@
 
 <script>
   import Modal from '~/components/Modal.vue'
+  import _ from 'lodash'
+  import fecha from 'fecha'
 
   export default {
     components: {Modal},
@@ -71,7 +73,48 @@
           day: 0,
           weekCount: 0
         },
-        showModal: false
+        showModal: false,
+        CalendarData: [
+          {
+            date: '2022-01-25',
+            pay_item: 32,
+            receive_item: 12
+          },
+          {
+            date: '2022-01-26',
+            pay_item: 10,
+            receive_item: 12
+          },
+          {
+            date: '2022-01-27',
+            pay_item: 20,
+            receive_item: 15
+          },
+          {
+            date: '2022-01-11',
+            pay_item: 8,
+            receive_item: 12
+          },
+          {
+            date: '2022-02-11',
+            pay_item: 8,
+            receive_item: 12
+          },
+          {
+            date: '2022-02-18',
+            pay_item: 8,
+            receive_item: 12
+          },
+          {
+            date: '2022-02-20',
+            pay_item: 8,
+            receive_item: 12
+          },
+          {
+            date: '2022-03-11',
+            pay_item: 8
+          }
+        ]
       };
     },
     mounted() {
@@ -106,9 +149,7 @@
     computed: {
       calendarFirstDay() {
         const mDate = new Date(this.calendar.year, this.calendar.month, 1)
-        console.log(mDate)
         const date = new Date(this.calendar.year, this.calendar.month, 1 - mDate.getDay())
-        console.log(date)
         return {
           year: date.getFullYear(),
           month: date.getMonth(),
@@ -119,13 +160,19 @@
       calendarMonth() {
         const data = []
         let date
-        for(let i = 0; i < 42; i++) {
+        for(let i = 0; i < (this.calendarWeekCount * 7); i++) {
           date = new Date(this.calendarFirstDay.year, this.calendarFirstDay.month, this.calendarFirstDay.date + i)
+
+          let calendarDate = fecha.format(date, 'YYYY-MM-DD');
+          let obj = _.find(this.CalendarData, {'date': calendarDate});
+
           data.push({
             year: date.getFullYear(),
             month: date.getMonth(),
             date: date.getDate(),
-            day: date.getDay()
+            day: date.getDay(),
+            pay_item: (obj && obj.pay_item ? obj.pay_item : 0),
+            receive_item: (obj && obj.receive_item ? obj.receive_item : 0)
           })
         }
         return data
@@ -201,5 +248,6 @@
     padding:   0px 2px;
     flex-grow: 1;
     color:     #FFF;
+    font-size: 22px;
   }
 </style>
