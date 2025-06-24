@@ -1,0 +1,1 @@
+import{t,x as s,v as o}from"./ZJiFYqKs.js";const c={class:"min-h-screen flex flex-col items-center justify-center space-y-6"},l={__name:"Home",setup(n){return(r,e)=>(o(),t("div",c,e[0]||(e[0]=[s("h1",{class:"text-3xl font-bold"},"HOME",-1)])))}};export{l as default};
