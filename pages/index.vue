@@ -1,17 +1,10 @@
 <template>
-  <div class="container">
-    <a class="links" href="https://google.com">連結test</a>
+  <div class="min-h-screen flex flex-col items-center justify-center space-y-6">
+    <h1 class="text-3xl font-bold">HOME</h1>
+<!--    <RouletteWheel />-->
   </div>
 </template>
 
-<script>
-export default {}
+<script setup>
+// import RouletteWheel from '~/components/RouletteWheel.vue'
 </script>
-
-<style lang="scss" scoped>
-  .container {
-    .links {
-      color: red;
-    }
-  }
-</style>

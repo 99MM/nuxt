@@ -1,190 +1,252 @@
 <template>
-  <section>
-    <h1 class="title">
-      <fa class="fa" style="float:left;" :icon="['fas', 'chevron-left']" @click="adjustDay(-1)"/>
-      <date-pick v-model="date" :format="format"
-                 :parseDate="parseDate"
-                 :formatDate="formatDate"
-                 :inputAttributes="{size: 32}">
-        <template v-slot:default="{toggle, inputValue}">
-          <span @click="toggle">
-            {{ inputValue }}
-          </span>
-        </template>
-      </date-pick>
-      <fa class="fa" style="float:right;" :icon="['fas', 'chevron-right']" @click="adjustDay(1)"/>
-    </h1>
-    <div style="padding: 15px">
-      <!-- @append="append"-->
-      <vue-masonry-wall :items="items" :options="options" :ssr="{columns: 2}">
-        <template v-slot:default="{item,index}">
-          <div class="item" :style="'background-color:'+getRandomColor(0.3)">
-            <div class="title">{{ item.key }}</div>
-            <!--                        <img :src="item.image"/>-->
-            <div class="Content">
-              <div class="detail" v-for="(itemPrice,index) in item.value" :style="'background-color:'+ itemPrice.color">
-                {{ itemPrice.title }}：${{ itemPrice.price }}
-              </div>
-            </div>
-          </div>
-        </template>
-      </vue-masonry-wall>
-
+  <div class="date-picker-container">
+    <div class="fake-input" @click="toggleCalendar">
+      {{ selectedDate ? selectedDate : '選擇日期' }}
     </div>
-  </section>
+    <div v-if="showCalendar" class="calendar-popup">
+      <div class="calendar-header">
+        <button @click="prevMonth">←</button>
+        <span @click="toggleYearPicker">
+          {{ currentYear }}年 {{ currentMonth + 1 }}月
+        </span>
+        <button @click="nextMonth">→</button>
+      </div>
+
+      <!-- 年份選擇器 (在月曆內顯示) -->
+      <div v-if="showYearPicker" class="year-selector">
+        <button @click="changeYear(-1)">上一年</button>
+        <button @click="changeYear(1)">下一年</button>
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th v-for="day in days" :key="day">{{ day }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(week, i) in calendar" :key="i">
+          <td v-for="date in week" :key="date.date"
+              :class="{ today: isToday(date.date), selected: isSelected(date.date) }"
+              @click="selectDate(date.date)">
+            {{ date.text }}
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
-<script>
+<script setup>
+import {ref, computed} from 'vue'
+import {useDateUtils} from '@/composables/useDateUtils'
 
-  import DatePick from 'vue-date-pick';
-  import 'vue-date-pick/dist/vueDatePick.css';
-  import VueMasonryWall from "vue-masonry-wall";
-  import fecha from 'fecha';
-  import _ from 'lodash';
+const {
+  weekDays,
+  getWeekNumber,
+  getFirstDayOfMonth,
+  getMonthMatrix
+} = useDateUtils()
 
-  export default {
-    name: "app",
-    components: {DatePick, VueMasonryWall},
-    head() {
-      return {
-        title: "日歷"
-      };
-    },
-    data() {
-      return {
-        user_id: 4,
-        format: 'ddd MMM DD, YYYY',/*顯示的日期格式*/
-        date: fecha.format(new Date(), 'ddd MMM DD, YYYY'),
-        options: {
-          width: 300,
-          padding: {
-            2: 8,
-            default: 12
-          }
-        },
-        items: []
-      };
-    },
-    created(){
-      for (var i = 0; i < 1000; i++) {
-        this.items.push({
-          id: i,
-          title: '項目名稱',
-          date: '2021-11-25 05:59:37',
-          item_user_id: Math.floor(Math.random()*(4-3+1))+3,
-          user_id: Math.floor(Math.random()*(4-3+1))+3,
-          price: Math.floor(Math.random() * 10000),
-          owner_id: 1,
-          owner_name: Math.floor(Math.random() * 100)
-        });
-      }
-    },
-    mounted() {
-      let ary_re = [], ary_pay = [];
-      _.forEach(this.items, (obj) => {
-        if(obj.user_id === this.user_id) {
-          obj.color = 'darkseagreen';
-          ary_pay.push(obj);
-        } else {
-          obj.color = 'lightseagreen';
-          ary_re.push(obj);
-        }
-      });
-      ary_pay = _.orderBy(ary_pay, ['item_user_id'], ['asc']);
-      ary_re = _.orderBy(ary_re, ['user_id'], ['asc']);
-      this.items = _.groupBy(_.concat(ary_re, ary_pay), 'owner_name');
-      this.items = Object.keys(this.items).map(key => ({key, value: this.items[key]}));
-    },
-    methods: {
-      getRandomColor: function(alpha) {
-        let r = Math.floor(Math.random() * 256); //随机生成256以内r值
-        let g = Math.floor(Math.random() * 256); //随机生成256以内g值
-        let b = Math.floor(Math.random() * 256); //随机生成256以内b值
-        return `rgb(${r},${g},${b},${alpha})`; //返回rgba(r,g,b,a)格式颜色
-      },
-      setToday() {
-        // this.today.year = this.displayDate.getFullYear()
-        // this.today.month = this.displayDate.getMonth() // 0~11
-        // this.today.date = this.displayDate.getDate()
-        // this.today.day = this.displayDate.getDay()
-        // this.displayDate = fecha.format(this.displayDate, 'ddd MMM DD, YYYY')
-      },
-      adjustDay(fix) {
-        let displayDate = fecha.parse(this.date, this.format);
-        displayDate.setDate(displayDate.getDate() + fix);
-        this.date = fecha.format(displayDate, 'ddd MMM DD, YYYY');
-      },
-      append() {
-        for(let i = 0; i < 20; i++) {
-          this.items.push({
-            title: `Item ${this.items.length}`,
-            content: 'Content',
-            image: 'https://picsum.photos/id/1039/300/300'
-          })
-        }
-      },
-      parseDate(dateString, format) {
-        return fecha.parse(dateString, format);
-      },
-      formatDate(dateObj, format) {
-        return fecha.format(dateObj, format);
-      }
-    },
-    computed: {}
+
+const now = new Date()
+console.log('本月第一天是星期幾：', getFirstDayOfMonth(now))
+console.log('本週是第幾週：', getWeekNumber(now))
+console.log('日曆格子矩陣：', getMonthMatrix(now))
+
+
+const showCalendar = ref(false)
+const selectedDate = ref('')
+const today = new Date()
+
+const days = weekDays
+
+const showYearPicker = ref(false) // 控制年份選擇器顯示
+const currentMonth = ref(today.getMonth()) // 當前月份
+const currentYear = ref(today.getFullYear()) // 當前年份
+
+const toggleCalendar = () => {
+  showCalendar.value = !showCalendar.value
+}
+
+const isToday = (date) => {
+  const d = new Date(date)
+  return d.toDateString() === today.toDateString()
+}
+
+const isSelected = (date) => {
+  return selectedDate.value === date
+}
+
+const selectDate = (date) => {
+  selectedDate.value = date
+  showCalendar.value = false
+}
+
+// 切換月份
+const prevMonth = () => {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value -= 1
+  } else {
+    currentMonth.value -= 1
   }
+}
+
+const nextMonth = () => {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value += 1
+  } else {
+    currentMonth.value += 1
+  }
+}
+
+// 切換年份
+const toggleYearPicker = () => {
+  showYearPicker.value = !showYearPicker.value
+}
+
+const changeYear = (increment) => {
+  currentYear.value += increment
+}
+
+// 生成日曆
+const calendar = computed(() => {
+  const start = new Date(currentYear.value, currentMonth.value, 1)
+  const end = new Date(currentYear.value, currentMonth.value + 1, 0)
+
+  const startDay = start.getDay()
+  const totalDays = end.getDate()
+
+  const result = []
+  let week = []
+
+
+
+  // 填充空白
+  for (let i = 0; i < startDay; i++) {
+    week.push({text: '', date: null})
+  }
+
+  for (let i = 1; i <= totalDays; i++) {
+    const dateStr = new Date(currentYear.value, currentMonth.value, i).toISOString().split('T')[0]
+    week.push({text: i, date: dateStr})
+    if (week.length === 7) {
+      result.push(week)
+      week = []
+    }
+  }
+
+  if (week.length > 0) result.push(week)
+
+  return result
+})
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+.date-picker-container {
+  position: relative;
+  width: 250px;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-  .title{
-    background-color: #2F4F4F;
-    color:            #FFF;
-    text-align:       center;
-    font-size:        2em;
-    font-weight:      bold;
-    margin-top:       0px;
-    span{
-      font-size:        3em;
-      font-weight:      bold;
-      background-color: #2F4F4F;
-      color:            #FFF;
-      margin-top:       0px;
-    }
-  }
-  .fa{
-    margin: 4px 10px;
-  }
-  section{
-    text-align: center;
-    border:     2px solid #2F4F4F;
-    min-height: 500px;
-  }
-  .item{
-    overflow:      hidden;
-    border-radius: 4px;
-    width:         100%;
-    background:    #f5f5f5;
-    .detail{
-      margin:  5px;
-      padding: 0px 2px;
-      color:   #FFF;
-    }
-    .title{
-      font-size:        22px;
-      padding:          10px;
-      background-color: #1f335f;
-    }
-  }
-  .Content{
-    padding: 20px;
-  }
-  img{
-    -o-object-fit: cover;
-    object-fit:    cover;
-    width:         100%;
-    height:        100%;
-    line-height:   0;
-    display:       block;
-  }
+.fake-input {
+  background: #2f4f4f;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  border: 1px solid #ccc;
+}
 
+.calendar-popup {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px;
+
+  color: #333;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  width: 220px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendar-header button {
+  background-color: #2f4f4f;
+  border: none;
+  color: #fff;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.calendar-header button:hover {
+  background-color: #3b5d5d;
+}
+
+.calendar-header span {
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.year-selector {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.year-selector button {
+  background-color: #2f4f4f;
+  border: none;
+  color: #fff;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 5px;
+  font-size: 12px;
+}
+
+.year-selector button:hover {
+  background-color: #3b5d5d;
+}
+
+.calendar-popup table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar-popup td {
+  width: 14%;
+  text-align: center;
+  padding: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-popup td:hover {
+  background-color: #f0f0f0;
+}
+
+.selected {
+  background-color: #2f4f4f;
+  color: white;
+}
+
+.today {
+  border: 1px solid #0ff;
+}
 </style>
