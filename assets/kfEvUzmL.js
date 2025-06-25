@@ -1,1 +1,0 @@
-import{t,x as s,v as n}from"./Bv-5RcyY.js";const o={class:"min-h-screen flex flex-col items-center justify-center space-y-6"},l={__name:"LineLogin",setup(c){return(r,e)=>(n(),t("div",o,e[0]||(e[0]=[s("h1",{class:"text-3xl font-bold"},"HOME",-1)])))}};export{l as default};
