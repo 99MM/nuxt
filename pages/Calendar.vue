@@ -1,12 +1,44 @@
 <template>
   <div id="app" v-cloak>
-    <h1>{{ calendar.year }} 年 {{ calendar.month + 1 }} 月</h1>
-    <div>
-      <button @click="adjustYear(-1)">上一年</button>
-      <button @click="adjustMonth(-1)">上個月</button>
-      <button @click="setToday">今天</button>
-      <button @click="adjustMonth(1)">下個月</button>
-      <button @click="adjustYear(1)">下一年</button>
+    <h1 class="text-3xl font-bold text-center text-[#2F4F4F] mb-6 tracking-wide ">
+      {{ calendar.year }} 年 {{ calendar.month + 1 }} 月
+    </h1>
+
+    <div class="flex flex-wrap gap-3 justify-center mb-6">
+      <button
+          @click="adjustYear(-1)"
+          class="px-4 py-2 bg-[#2F4F4F] text-white rounded-lg shadow hover:bg-[#253C3C] transition"
+      >
+        ⬅ 上一年
+      </button>
+
+      <button
+          @click="adjustMonth(-1)"
+          class="px-4 py-2 bg-[#3D5A80] text-white rounded-lg shadow hover:bg-[#2C4666] transition"
+      >
+        ◀ 上個月
+      </button>
+
+      <button
+          @click="setToday"
+          class="px-4 py-2 bg-[#E07A5F] text-white font-semibold rounded-lg shadow hover:bg-[#C75B3C] transition"
+      >
+        ● 今天
+      </button>
+
+      <button
+          @click="adjustMonth(1)"
+          class="px-4 py-2 bg-[#3D5A80] text-white rounded-lg shadow hover:bg-[#2C4666] transition"
+      >
+        下個月 ▶
+      </button>
+
+      <button
+          @click="adjustYear(1)"
+          class="px-4 py-2 bg-[#2F4F4F] text-white rounded-lg shadow hover:bg-[#253C3C] transition"
+      >
+        下一年 ➡
+      </button>
     </div>
     <div class="calendar">
       <div class="weekDay">
